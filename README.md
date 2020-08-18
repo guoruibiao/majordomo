@@ -1,0 +1,2 @@
+# majordomo
+personal knowledge base
