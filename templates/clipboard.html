@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIPBOARD-LOGS-SEARCH</title>
+    <script src="/statics/js/vue.min.js"></script>
+    <script src="/statics/js/axios.min.js"></script>
+</head>
+<body>
+    <h3>CLIPBOARD-LOGS-SEARCH</h3>
+
+    <div id="app">
+        <input type="text" v-model="keyword" placeholder="输入关键字来查询痕迹库内容">
+        <button v-on:click="search">GO</button>
+        <hr>
+        <div id="result">
+        </div>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data:{
+            keyword: "",
+            list: [],
+        },
+        methods: {
+            search: function() {
+                var url = "/clipboard/search?content=" + this.keyword + "&ext=" + this.keyword;
+                axios.get(url)
+                    .then(function(response){
+                        console.log(response);
+                        var resultContainer = document.getElementById("result");
+                        resultContainer.innerHTML = "";
+                        var datalist = response.data.data.hits.hits;
+                        if (datalist.length>0) {
+                            var node = document.createElement("span");
+                            node.innerText = "查询结果如下";
+                            resultContainer.appendChild(node);
+                        }else{
+                            var node = document.createElement("span");
+                            node.innerText = "查询结果为空";
+                            resultContainer.appendChild(node);
+                        }
+                        for(var index=0; index<datalist.length; index++){
+                            var node = document.createElement("div");
+                            node.innerHTML = "<br><pre><code>" + JSON.stringify(datalist[index], null, 4) +"</code></pre><br>";
+                            resultContainer.appendChild(node);
+                        }
+                        console.log(this.list);
+                    })
+                    .catch(function(err){
+                        console.log(err)
+                    });
+            }
+        }
+    });
+</script>
+</html>
